@@ -20,7 +20,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Pencegah Stunting</h1>
-          <p className="text-gray-600">Sistem Monitoring Stunting untuk Posyandu Tambakan</p>
+          <p className="text-gray-600">Sistem Monitoring Stunting untuk Posyandu</p>
         </div>
 
         {/* Stats Cards */}
@@ -125,6 +125,8 @@ export default function Dashboard() {
                 {
                   nik: "3201234567890123",
                   name: "Andi Pratama",
+                  parentName: "Budi Pratama",
+                  posyandu: "Posyandu 1",
                   age: "2 tahun 3 bulan",
                   status: "Normal",
                   date: "Hari ini, 14:30",
@@ -132,6 +134,8 @@ export default function Dashboard() {
                 {
                   nik: "3201234567890124",
                   name: "Sari Indah",
+                  parentName: "Dewi Sari",
+                  posyandu: "Sukorejo",
                   age: "1 tahun 8 bulan",
                   status: "Stunting",
                   date: "Hari ini, 13:45",
@@ -139,6 +143,8 @@ export default function Dashboard() {
                 {
                   nik: "3201234567890125",
                   name: "Budi Santoso",
+                  parentName: "Santi Budiarti",
+                  posyandu: "Posyandu 2",
                   age: "3 tahun 1 bulan",
                   status: "Normal",
                   date: "Hari ini, 11:20",
@@ -148,7 +154,10 @@ export default function Dashboard() {
                   <div className="flex-1">
                     <div className="font-medium">{child.name}</div>
                     <div className="text-sm text-gray-500">
-                      NIK: {child.nik} • Usia: {child.age}
+                      NIK: {child.nik} • Orang Tua: {child.parentName}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Posyandu: {child.posyandu} • Usia: {child.age}
                     </div>
                   </div>
                   <div className="flex items-center gap-4">

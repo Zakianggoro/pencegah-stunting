@@ -8,12 +8,14 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Calculator, Save } from "lucide-react"
 import Link from "next/link"
-import { calculateStuntingStatus } from "../../../lib/stunting-calculator"
+import { calculateStuntingStatus } from "@/lib/stunting-calculator"
 
 export default function InputPage() {
   const [formData, setFormData] = useState({
     nik: "",
     name: "",
+    parentName: "",
+    posyandu: "",
     birthDate: "",
     gender: "",
     height: "",
@@ -61,12 +63,18 @@ export default function InputPage() {
   }
 
   const handleSave = () => {
-    // In real app, this would save to database
+    if (!formData.parentName || !formData.posyandu) {
+      alert("Mohon lengkapi nama orang tua dan pilih posyandu")
+      return
+    }
+    // In real app, this would save to database with parentName and posyandu
     alert("Data berhasil disimpan!")
     // Reset form
     setFormData({
       nik: "",
       name: "",
+      parentName: "",
+      posyandu: "",
       birthDate: "",
       gender: "",
       height: "",
@@ -115,6 +123,31 @@ export default function InputPage() {
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="parentName">Nama Orang Tua</Label>
+                <Input
+                  id="parentName"
+                  placeholder="Masukkan nama orang tua"
+                  value={formData.parentName}
+                  onChange={(e) => handleInputChange("parentName", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="posyandu">Posyandu</Label>
+                <Select value={formData.posyandu} onValueChange={(value) => handleInputChange("posyandu", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih posyandu" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="posyandu-1">Posyandu 1</SelectItem>
+                    <SelectItem value="posyandu-2">Posyandu 2</SelectItem>
+                    <SelectItem value="sukorejo">Sukorejo</SelectItem>
+                    <SelectItem value="tekik">Tekik</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-2">

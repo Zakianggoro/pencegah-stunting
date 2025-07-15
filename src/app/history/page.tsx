@@ -4,8 +4,9 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Search, TrendingDown, TrendingUp } from "lucide-react"
+import { ArrowLeft, Search, TrendingDown, TrendingUp, Download } from "lucide-react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default function HistoryPage() {
   const [selectedMonth, setSelectedMonth] = useState("2024-01")
@@ -17,6 +18,8 @@ export default function HistoryPage() {
       {
         nik: "3201234567890123",
         name: "Andi Pratama",
+        parentName: "Budi Pratama",
+        posyandu: "Posyandu 1",
         age: "2 tahun 3 bulan",
         height: 85.5,
         weight: 12.3,
@@ -26,6 +29,8 @@ export default function HistoryPage() {
       {
         nik: "3201234567890124",
         name: "Sari Indah",
+        parentName: "Dewi Sari",
+        posyandu: "Sukorejo",
         age: "1 tahun 8 bulan",
         height: 75.2,
         weight: 8.9,
@@ -35,6 +40,8 @@ export default function HistoryPage() {
       {
         nik: "3201234567890125",
         name: "Budi Santoso",
+        parentName: "Santi Budiarti",
+        posyandu: "Posyandu 2",
         age: "3 tahun 1 bulan",
         height: 92.1,
         weight: 14.2,
@@ -44,6 +51,8 @@ export default function HistoryPage() {
       {
         nik: "3201234567890126",
         name: "Maya Sari",
+        parentName: "Rina Maya",
+        posyandu: "Tekik",
         age: "2 tahun 6 bulan",
         height: 82.3,
         weight: 10.8,
@@ -53,6 +62,8 @@ export default function HistoryPage() {
       {
         nik: "3201234567890127",
         name: "Rudi Hartono",
+        parentName: "Hartono Wijaya",
+        posyandu: "Posyandu 1",
         age: "4 tahun 2 bulan",
         height: 98.7,
         weight: 16.5,
@@ -64,6 +75,8 @@ export default function HistoryPage() {
       {
         nik: "3201234567890123",
         name: "Andi Pratama",
+        parentName: "Budi Pratama",
+        posyandu: "Posyandu 1",
         age: "2 tahun 2 bulan",
         height: 84.8,
         weight: 12.0,
@@ -73,6 +86,8 @@ export default function HistoryPage() {
       {
         nik: "3201234567890124",
         name: "Sari Indah",
+        parentName: "Dewi Sari",
+        posyandu: "Sukorejo",
         age: "1 tahun 7 bulan",
         height: 74.5,
         weight: 8.7,
@@ -82,6 +97,8 @@ export default function HistoryPage() {
       {
         nik: "3201234567890125",
         name: "Budi Santoso",
+        parentName: "Santi Budiarti",
+        posyandu: "Posyandu 2",
         age: "3 tahun",
         height: 91.2,
         weight: 13.8,
@@ -103,6 +120,47 @@ export default function HistoryPage() {
   }
 
   const stuntingPercentage = stats.total > 0 ? ((stats.stunting / stats.total) * 100).toFixed(1) : "0"
+
+  const exportToCSV = () => {
+    const headers = [
+      "NIK",
+      "Nama Anak",
+      "Nama Orang Tua",
+      "Posyandu",
+      "Usia",
+      "Tinggi Badan (cm)",
+      "Berat Badan (kg)",
+      "Status Stunting",
+      "Tanggal Pemeriksaan",
+    ]
+
+    const csvContent = [
+      headers.join(","),
+      ...currentData.map((child) =>
+        [
+          child.nik,
+          `"${child.name}"`,
+          `"${child.parentName}"`,
+          `"${child.posyandu}"`,
+          `"${child.age}"`,
+          child.height,
+          child.weight,
+          child.status,
+          child.date,
+        ].join(","),
+      ),
+    ].join("\n")
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", `data-stunting-${selectedMonth}.csv`)
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -192,10 +250,18 @@ export default function HistoryPage() {
         {/* Data Table */}
         <Card>
           <CardHeader>
-            <CardTitle>Data Balita - {selectedMonth}</CardTitle>
-            <CardDescription>
-              Menampilkan {filteredData.length} dari {stats.total} data balita
-            </CardDescription>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Data Balita - {selectedMonth}</CardTitle>
+                <CardDescription>
+                  Menampilkan {filteredData.length} dari {stats.total} data balita
+                </CardDescription>
+              </div>
+              <Button onClick={exportToCSV} variant="outline" className="flex items-center gap-2 bg-transparent">
+                <Download className="h-4 w-4" />
+                Cetak CSV
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             {filteredData.length > 0 ? (
@@ -207,6 +273,8 @@ export default function HistoryPage() {
                         <div className="font-medium text-lg">{child.name}</div>
                         <div className="text-sm text-gray-500 space-y-1">
                           <div>NIK: {child.nik}</div>
+                          <div>Orang Tua: {child.parentName}</div>
+                          <div>Posyandu: {child.posyandu}</div>
                           <div>Usia: {child.age}</div>
                           <div>
                             TB: {child.height} cm • BB: {child.weight} kg
