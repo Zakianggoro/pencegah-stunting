@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Users, TrendingUp, Calendar, Plus } from "lucide-react"
+import { Users, TrendingUp, Calendar, Plus, Search } from "lucide-react"
 import Link from "next/link"
 
 export default function Dashboard() {
@@ -73,7 +73,7 @@ export default function Dashboard() {
         </div>
 
         {/* Action Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -107,6 +107,23 @@ export default function Dashboard() {
               <Link href="/history">
                 <Button variant="outline" className="w-full bg-transparent" size="lg">
                   Lihat Riwayat Data
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5 text-purple-600" />
+                Cari Data Anak
+              </CardTitle>
+              <CardDescription>Cari dan lihat semua riwayat pemeriksaan anak berdasarkan nama atau NIK</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/search">
+                <Button variant="outline" className="w-full bg-transparent" size="lg">
+                  Mulai Pencarian
                 </Button>
               </Link>
             </CardContent>
