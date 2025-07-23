@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { ArrowLeft, Search, TrendingDown, TrendingUp, Download } from "lucide-react"
+import { ArrowLeft, Search, TrendingDown, TrendingUp, Download, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -162,6 +162,24 @@ export default function HistoryPage() {
     document.body.removeChild(link)
   }
 
+  const handleDelete = (childNik: string, childName: string) => {
+    const confirmDelete = window.confirm(
+      `Apakah Anda yakin ingin menghapus data ${childName} (NIK: ${childNik})?\n\nTindakan ini tidak dapat dibatalkan.`,
+    )
+
+    if (confirmDelete) {
+      // In real app, this would call API to delete from database
+      alert(`Data ${childName} berhasil dihapus!`)
+      // Here you would typically:
+      // 1. Call API to delete from database
+      // 2. Refresh the data or remove from local state
+      // 3. Show success notification
+
+      // For demo purposes, we'll just show success message
+      // In real implementation, you'd update the state to remove the deleted item
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       <div className="container mx-auto px-4 py-8">
@@ -290,6 +308,14 @@ export default function HistoryPage() {
                           {child.status}
                         </span>
                         <span className="text-sm text-gray-500">{child.date}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(child.nik, child.name)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>

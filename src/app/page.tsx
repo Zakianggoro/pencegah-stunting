@@ -20,7 +20,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Pencegah Stunting</h1>
-          <p className="text-gray-600">Sistem Monitoring Stunting untuk Posyandu</p>
+          <p className="text-gray-600">Sistem Monitoring Stunting untuk Posyandu Tambakan</p>
         </div>
 
         {/* Stats Cards */}
@@ -43,7 +43,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">{stats.stuntingCases}</div>
-              <p className="text-xs text-muted-foreground">{stuntingPercentage}% dari total balita</p>
+              <p className="text-base text-muted-foreground">{stuntingPercentage}% dari total balita</p>
             </CardContent>
           </Card>
 
