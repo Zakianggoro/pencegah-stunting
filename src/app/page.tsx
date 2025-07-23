@@ -19,8 +19,13 @@ export default function Dashboard() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Pencegah Stunting</h1>
-          <p className="text-gray-600">Sistem Monitoring Stunting untuk Posyandu Tambakan</p>
+          <div className="flex justify-between items-start mb-2">
+            <h1 className="text-4xl font-bold text-gray-900">Pencegah Stunting</h1>
+            <div className="text-right">
+              <p className="text-sm font-medium text-gray-700">MMD FILKOM 2025 - 11</p>
+            </div>
+          </div>
+          <p className="text-gray-600">Sistem Monitoring Stunting untuk Posyandu</p>
         </div>
 
         {/* Stats Cards */}
@@ -43,7 +48,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-red-600">{stats.stuntingCases}</div>
-              <p className="text-base text-muted-foreground">{stuntingPercentage}% dari total balita</p>
+              <p className="text-xs text-muted-foreground">{stuntingPercentage}% dari total balita</p>
             </CardContent>
           </Card>
 
