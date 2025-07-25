@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Calculator, Save } from "lucide-react"
+import { ArrowLeft, Calculator, Save, Plus } from "lucide-react"
 import Link from "next/link"
 import { calculateStuntingStatus } from "@/lib/stunting-calculator"
 
@@ -92,8 +92,18 @@ export default function InputPage() {
             <ArrowLeft className="h-4 w-4" />
             Kembali ke Dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Input Data Balita</h1>
-          <p className="text-gray-600">Masukkan data balita untuk deteksi stunting otomatis</p>
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Input Data Balita</h1>
+              <p className="text-gray-600">Masukkan data balita untuk deteksi stunting otomatis</p>
+            </div>
+            <Link href="/input/update">
+              <Button variant="outline" className="flex items-center gap-2 bg-transparent">
+                <Plus className="h-4 w-4" />
+                Update Data
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
