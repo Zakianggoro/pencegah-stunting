@@ -2,89 +2,182 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Calculator, Save } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { ArrowLeft, Search, TrendingDown, TrendingUp, Download, Trash2 } from "lucide-react"
 import Link from "next/link"
-import { calculateStuntingStatus } from "@/lib/stunting-calculator"
+import { Button } from "@/components/ui/button"
 
-export default function FollowUpInputPage() {
-  const [formData, setFormData] = useState({
-    nik: "",
-    posyandu: "",
-    examDate: "",
-    height: "",
-    weight: "",
-  })
+export default function HistoryPage() {
+  const [selectedMonth, setSelectedMonth] = useState("2024-01")
+  const [searchTerm, setSearchTerm] = useState("")
 
-  const [result, setResult] = useState<{
-    status: string
-    heightForAge: string
-    weightForHeight: string
-    recommendation: string
-  } | null>(null)
-
-  const [isCalculating, setIsCalculating] = useState(false)
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+  // Mock historical data
+  const historicalData = {
+    "2024-01": [
+      {
+        nik: "3201234567890123",
+        name: "Andi Pratama",
+        parentName: "Budi Pratama",
+        posyandu: "Posyandu 1",
+        age: "2 tahun 3 bulan",
+        height: 85.5,
+        weight: 12.3,
+        status: "Normal",
+        date: "2024-01-15",
+      },
+      {
+        nik: "3201234567890124",
+        name: "Sari Indah",
+        parentName: "Dewi Sari",
+        posyandu: "Sukorejo",
+        age: "1 tahun 8 bulan",
+        height: 75.2,
+        weight: 8.9,
+        status: "Stunting",
+        date: "2024-01-12",
+      },
+      {
+        nik: "3201234567890125",
+        name: "Budi Santoso",
+        parentName: "Santi Budiarti",
+        posyandu: "Posyandu 2",
+        age: "3 tahun 1 bulan",
+        height: 92.1,
+        weight: 14.2,
+        status: "Normal",
+        date: "2024-01-10",
+      },
+      {
+        nik: "3201234567890126",
+        name: "Maya Sari",
+        parentName: "Rina Maya",
+        posyandu: "Tekik",
+        age: "2 tahun 6 bulan",
+        height: 82.3,
+        weight: 10.8,
+        status: "Stunting",
+        date: "2024-01-08",
+      },
+      {
+        nik: "3201234567890127",
+        name: "Rudi Hartono",
+        parentName: "Hartono Wijaya",
+        posyandu: "Posyandu 1",
+        age: "4 tahun 2 bulan",
+        height: 98.7,
+        weight: 16.5,
+        status: "Normal",
+        date: "2024-01-05",
+      },
+    ],
+    "2023-12": [
+      {
+        nik: "3201234567890123",
+        name: "Andi Pratama",
+        parentName: "Budi Pratama",
+        posyandu: "Posyandu 1",
+        age: "2 tahun 2 bulan",
+        height: 84.8,
+        weight: 12.0,
+        status: "Normal",
+        date: "2023-12-20",
+      },
+      {
+        nik: "3201234567890124",
+        name: "Sari Indah",
+        parentName: "Dewi Sari",
+        posyandu: "Sukorejo",
+        age: "1 tahun 7 bulan",
+        height: 74.5,
+        weight: 8.7,
+        status: "Stunting",
+        date: "2023-12-18",
+      },
+      {
+        nik: "3201234567890125",
+        name: "Budi Santoso",
+        parentName: "Santi Budiarti",
+        posyandu: "Posyandu 2",
+        age: "3 tahun",
+        height: 91.2,
+        weight: 13.8,
+        status: "Normal",
+        date: "2023-12-15",
+      },
+    ],
   }
 
-  const calculateAge = (birthDate: string, examDate: string) => {
-    const birth = new Date(birthDate)
-    const exam = new Date(examDate)
-    const ageInMonths = (exam.getFullYear() - birth.getFullYear()) * 12 + (exam.getMonth() - birth.getMonth())
-    return ageInMonths
+  const currentData = historicalData[selectedMonth as keyof typeof historicalData] || []
+  const filteredData = currentData.filter(
+    (child) => child.name.toLowerCase().includes(searchTerm.toLowerCase()) || child.nik.includes(searchTerm),
+  )
+
+  const stats = {
+    total: currentData.length,
+    stunting: currentData.filter((child) => child.status === "Stunting").length,
+    normal: currentData.filter((child) => child.status === "Normal").length,
   }
 
-  const handleCalculate = () => {
-    if (!formData.nik || !formData.examDate || !formData.height || !formData.weight) {
-      alert("Mohon lengkapi semua data yang diperlukan")
-      return
-    }
+  const stuntingPercentage = stats.total > 0 ? ((stats.stunting / stats.total) * 100).toFixed(1) : "0"
 
-    setIsCalculating(true)
+  const exportToCSV = () => {
+    const headers = [
+      "NIK",
+      "Nama Anak",
+      "Nama Orang Tua",
+      "Posyandu",
+      "Usia",
+      "Tinggi Badan (cm)",
+      "Berat Badan (kg)",
+      "Status Stunting",
+      "Tanggal Pemeriksaan",
+    ]
 
-    // Simulate calculation delay
-    setTimeout(() => {
-      // For demo purposes, we'll use a default age calculation
-      // In real app, this would fetch birth date from database using NIK
-      const defaultAge = 24 // months - this would come from database
-      const height = Number.parseFloat(formData.height)
-      const weight = Number.parseFloat(formData.weight)
-      const defaultGender = "male" // this would come from database
+    const csvContent = [
+      headers.join(","),
+      ...currentData.map((child) =>
+        [
+          child.nik,
+          `"${child.name}"`,
+          `"${child.parentName}"`,
+          `"${child.posyandu}"`,
+          `"${child.age}"`,
+          child.height,
+          child.weight,
+          child.status,
+          child.date,
+        ].join(","),
+      ),
+    ].join("\n")
 
-      const calculationResult = calculateStuntingStatus(defaultAge, height, weight, defaultGender)
-      setResult(calculationResult)
-      setIsCalculating(false)
-    }, 1000)
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", `data-stunting-${selectedMonth}.csv`)
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
-  const handleSave = () => {
-    if (!formData.posyandu) {
-      alert("Mohon pilih posyandu")
-      return
+  const handleDelete = (childNik: string, childName: string) => {
+    const confirmDelete = window.confirm(
+      `Apakah Anda yakin ingin menghapus data ${childName} (NIK: ${childNik})?\n\nTindakan ini tidak dapat dibatalkan.`,
+    )
+
+    if (confirmDelete) {
+      // In real app, this would call API to delete from database
+      alert(`Data ${childName} berhasil dihapus!`)
+      // Here you would typically:
+      // 1. Call API to delete from database
+      // 2. Refresh the data or remove from local state
+      // 3. Show success notification
+
+      // For demo purposes, we'll just show success message
+      // In real implementation, you'd update the state to remove the deleted item
     }
-
-    if (!result) {
-      alert("Hitung status stunting terlebih dahulu")
-      return
-    }
-
-    // In real app, this would save updated data to database
-    alert("Data terbaru berhasil disimpan!")
-
-    // Reset form
-    setFormData({
-      nik: "",
-      posyandu: "",
-      examDate: "",
-      height: "",
-      weight: "",
-    })
-    setResult(null)
   }
 
   return (
@@ -92,153 +185,149 @@ export default function FollowUpInputPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/input" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4">
+          <Link href="/" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-4">
             <ArrowLeft className="h-4 w-4" />
-            Kembali ke Input Data
+            Kembali ke Dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Update Data Balita</h1>
-          <p className="text-gray-600">Input pemeriksaan terbaru untuk anak yang sudah terdaftar</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Data Historis</h1>
+          <p className="text-gray-600">Lihat dan bandingkan data stunting dari bulan sebelumnya</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Input Form */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Data Pemeriksaan Terbaru</CardTitle>
-              <CardDescription>Masukkan data pemeriksaan terbaru untuk anak yang sudah terdaftar</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="nik">NIK Balita</Label>
-                <Input
-                  id="nik"
-                  placeholder="Masukkan NIK 16 digit"
-                  value={formData.nik}
-                  onChange={(e) => handleInputChange("nik", e.target.value)}
-                  maxLength={16}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="posyandu">Posyandu</Label>
-                <Select value={formData.posyandu} onValueChange={(value) => handleInputChange("posyandu", value)}>
+        {/* Filters */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Filter Data</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih posyandu" />
+                    <SelectValue placeholder="Pilih bulan" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="posyandu-1">Posyandu 1</SelectItem>
-                    <SelectItem value="posyandu-2">Posyandu 2</SelectItem>
-                    <SelectItem value="sukorejo">Sukorejo</SelectItem>
-                    <SelectItem value="tekik">Tekik</SelectItem>
+                    <SelectItem value="2024-01">Januari 2024</SelectItem>
+                    <SelectItem value="2023-12">Desember 2023</SelectItem>
+                    <SelectItem value="2023-11">November 2023</SelectItem>
+                    <SelectItem value="2023-10">Oktober 2023</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="examDate">Tanggal Pemeriksaan</Label>
-                <Input
-                  id="examDate"
-                  type="date"
-                  value={formData.examDate}
-                  onChange={(e) => handleInputChange("examDate", e.target.value)}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="height">Tinggi Badan (cm)</Label>
+              <div className="flex-1">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    id="height"
-                    type="number"
-                    placeholder="0.0"
-                    value={formData.height}
-                    onChange={(e) => handleInputChange("height", e.target.value)}
-                    step="0.1"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="weight">Berat Badan (kg)</Label>
-                  <Input
-                    id="weight"
-                    type="number"
-                    placeholder="0.0"
-                    value={formData.weight}
-                    onChange={(e) => handleInputChange("weight", e.target.value)}
-                    step="0.1"
+                    placeholder="Cari nama atau NIK..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
                   />
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
 
-              <Button onClick={handleCalculate} className="w-full" size="lg" disabled={isCalculating}>
-                {isCalculating ? (
-                  "Menghitung..."
-                ) : (
-                  <>
-                    <Calculator className="h-4 w-4 mr-2" />
-                    Hitung Status Stunting
-                  </>
-                )}
-              </Button>
+        {/* Stats for selected month */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Pemeriksaan</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.total}</div>
+              <p className="text-xs text-muted-foreground">Bulan {selectedMonth}</p>
             </CardContent>
           </Card>
 
-          {/* Result */}
           <Card>
-            <CardHeader>
-              <CardTitle>Hasil Analisis Terbaru</CardTitle>
-              <CardDescription>Status stunting dan rekomendasi untuk pemeriksaan terbaru</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Kasus Stunting</CardTitle>
+              <TrendingDown className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              {result ? (
-                <div className="space-y-6">
-                  {/* Status Badge */}
-                  <div className="text-center">
-                    <div
-                      className={`inline-flex items-center px-6 py-3 rounded-full text-lg font-semibold ${
-                        result.status === "Normal"
-                          ? "bg-green-100 text-green-800 border-2 border-green-200"
-                          : "bg-red-100 text-red-800 border-2 border-red-200"
-                      }`}
-                    >
-                      {result.status}
-                    </div>
-                  </div>
+              <div className="text-2xl font-bold text-red-600">{stats.stunting}</div>
+              <p className="text-xs text-muted-foreground">{stuntingPercentage}% dari total</p>
+            </CardContent>
+          </Card>
 
-                  {/* Measurements */}
-                  <div className="space-y-4">
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-medium mb-2">Tinggi Badan menurut Umur (TB/U)</h4>
-                      <p className="text-sm text-gray-600">{result.heightForAge}</p>
-                    </div>
-
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-medium mb-2">Berat Badan menurut Tinggi Badan (BB/TB)</h4>
-                      <p className="text-sm text-gray-600">{result.weightForHeight}</p>
-                    </div>
-                  </div>
-
-                  {/* Recommendation */}
-                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h4 className="font-medium text-blue-900 mb-2">Rekomendasi</h4>
-                    <p className="text-sm text-blue-800">{result.recommendation}</p>
-                  </div>
-
-                  {/* Save Button */}
-                  <Button onClick={handleSave} className="w-full" size="lg">
-                    <Save className="h-4 w-4 mr-2" />
-                    Simpan Data Terbaru
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
-                  <Calculator className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Lengkapi data pemeriksaan dan klik "Hitung Status Stunting" untuk melihat hasil analisis</p>
-                </div>
-              )}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Status Normal</CardTitle>
+              <TrendingUp className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{stats.normal}</div>
+              <p className="text-xs text-muted-foreground">
+                {(100 - Number.parseFloat(stuntingPercentage)).toFixed(1)}% dari total
+              </p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Data Table */}
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Data Balita - {selectedMonth}</CardTitle>
+                <CardDescription>
+                  Menampilkan {filteredData.length} dari {stats.total} data balita
+                </CardDescription>
+              </div>
+              <Button onClick={exportToCSV} variant="outline" className="flex items-center gap-2 bg-transparent">
+                <Download className="h-4 w-4" />
+                Cetak CSV
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {filteredData.length > 0 ? (
+              <div className="space-y-4">
+                {filteredData.map((child, index) => (
+                  <div key={index} className="p-4 border rounded-lg hover:bg-gray-50">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="font-medium text-lg">{child.name}</div>
+                        <div className="text-sm text-gray-500 space-y-1">
+                          <div>NIK: {child.nik}</div>
+                          <div>Orang Tua: {child.parentName}</div>
+                          <div>Posyandu: {child.posyandu}</div>
+                          <div>Usia: {child.age}</div>
+                          <div>
+                            TB: {child.height} cm • BB: {child.weight} kg
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            child.status === "Normal" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {child.status}
+                        </span>
+                        <span className="text-sm text-gray-500">{child.date}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(child.nik, child.name)}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <p>Tidak ada data yang ditemukan untuk kriteria pencarian ini</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )
