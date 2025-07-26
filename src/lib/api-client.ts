@@ -18,26 +18,31 @@ export const apiClient = async <T>(
     `${process.env.NEXT_PUBLIC_API_URL}${endpoint}`,
     config
   );
-  // console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
 
+  const contentType = response.headers.get("content-type") || "";
   const text = await response.text();
-  // console.log("Response:", text);
-
-  const contentType = response.headers.get("content-type");
 
   if (!response.ok) {
     let message = text;
-    if (contentType?.includes("application/json")) {
+    if (contentType.includes("application/json")) {
       try {
         const json = JSON.parse(text);
         message = json?.message || JSON.stringify(json);
-      } catch (_) {}
+      } catch (_) {
+        message = "Gagal mem-parsing error JSON dari server.";
+      }
     }
     throw new Error(message);
   }
 
-  if (contentType?.includes("application/json")) {
-    return JSON.parse(text) as T;
+  if (!text) return undefined as T;
+
+  if (contentType.includes("application/json")) {
+    try {
+      return JSON.parse(text) as T;
+    } catch (err) {
+      throw new Error("Gagal mem-parsing JSON.");
+    }
   }
 
   return text as unknown as T;
