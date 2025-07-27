@@ -73,10 +73,6 @@ export default function ResultCard({
           <p className="text-sm text-blue-800">{rekomendasi}</p>
         </div>
 
-        <Button className="w-full" size="lg">
-          <Save className="h-4 w-4 mr-2" />
-          Simpan Data
-        </Button>
       </CardContent>
     </Card>
   );

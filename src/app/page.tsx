@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Users, TrendingUp, Calendar, Plus, Search } from "lucide-react";
 import Link from "next/link";
+import { TutorialButton } from "@/components/tutorial-button"
 import { useDashboard } from "@/features/dashboard/hooks/dashboard";
 
 export default function Dashboard() {
@@ -44,7 +45,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {data?.stats.total_balita}
+                {(data?.stats.kasus_stunting ?? 0) + (data?.stats.status_normal ?? 0)}
               </div>
               <p className="text-xs text-muted-foreground">
                 Terdaftar dalam sistem
@@ -177,7 +178,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="h-[500px] overflow-y-auto">
             <div className="space-y-4">
-              {data?.aktivitas_terbaru?.map((child, index) => (
+              {data?.aktivitas_terbaru?.map((child : any, index : number) => (
                 <div
                   key={index}
                   className="flex items-center justify-between p-4 border rounded-lg"
@@ -215,6 +216,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Tutorial Button */}
+      <TutorialButton />
     </div>
   );
 }
