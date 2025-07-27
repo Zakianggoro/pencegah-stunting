@@ -11,6 +11,7 @@ import { useDashboard } from "@/features/dashboard/hooks/dashboard"
 import { groupByMonth, MONTH_OPTIONS } from "@/features/balita/utils/group-by-month"
 import { format } from "date-fns"
 import { useDeletePemeriksaan } from "@/features/pemeriksaan/hooks/pemeriksaan"
+import { TutorialButton } from "@/features/history/components/tutorial-button"
 
 export default function HistoryPage() {
   const [selectedMonth, setSelectedMonth] = useState(() => format(new Date(), "yyyy-MM"))
@@ -272,6 +273,8 @@ export default function HistoryPage() {
           </CardContent>
         </Card>
       </div>
+
+      <TutorialButton />
     </div>
   )
 }
