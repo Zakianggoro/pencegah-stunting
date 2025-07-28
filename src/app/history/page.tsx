@@ -13,9 +13,19 @@ import { format } from "date-fns"
 import { useDeletePemeriksaan } from "@/features/pemeriksaan/hooks/pemeriksaan"
 import { TutorialButton } from "@/features/history/components/tutorial-button"
 
+// Define POSYANDU_OPTIONS
+const POSYANDU_OPTIONS = [
+  { value: "all", label: "Semua Posyandu" },
+  { value: "sukorejo", label: "Sukorejo" },
+  { value: "tekik", label: "Tekik" },
+  { value: "tambakan", label: "Tambakan" },
+  { value: "kantor desa", label: "Kantor Desa" },
+]
+
 export default function HistoryPage() {
   const [selectedMonth, setSelectedMonth] = useState(() => format(new Date(), "yyyy-MM"))
   const [searchTerm, setSearchTerm] = useState("")
+  const [selectedPosyandu, setSelectedPosyandu] = useState("all") // New state for posyandu filter
 
   const { data: DashboardData } = useDashboard()
   const { mutate: handleDelete } = useDeletePemeriksaan()
@@ -61,18 +71,26 @@ export default function HistoryPage() {
     }
   }
 
+  // Filter data based on month, search term, and posyandu
+  const filteredData = useMemo(() => {
+    return currentData.filter((child) => {
+      const matchesSearchTerm =
+        child.name.toLowerCase().includes(searchTerm.toLowerCase()) || child.nik.includes(searchTerm)
+      const matchesPosyandu =
+        selectedPosyandu === "all" || child.posyandu.toLowerCase() === selectedPosyandu.toLowerCase()
+      return matchesSearchTerm && matchesPosyandu
+    })
+  }, [currentData, searchTerm, selectedPosyandu])
+
+  // Calculate stats based on the filtered data
   const stats = {
-    total: currentData.length,
-    stunting: currentData.filter((child) => child.status === "Stunting").length,
-    normal: currentData.filter((child) => child.status === "Normal").length,
+    total: filteredData.length,
+    stunting: filteredData.filter((child) => child.status === "Stunting").length,
+    normal: filteredData.filter((child) => child.status === "Normal").length,
   }
 
-  const filteredData = currentData.filter(
-    (child) => child.name.toLowerCase().includes(searchTerm.toLowerCase()) || child.nik.includes(searchTerm),
-  )
-
   const exportToCSV = () => {
-    if (currentData.length === 0) {
+    if (filteredData.length === 0) {
       alert("Tidak ada data untuk diekspor")
       return
     }
@@ -91,7 +109,7 @@ export default function HistoryPage() {
 
     const csvContent = [
       headers.join(","),
-      ...currentData.map((child) =>
+      ...filteredData.map((child) =>
         [
           child.nik,
           `"${child.name}"`,
@@ -112,7 +130,7 @@ export default function HistoryPage() {
     const link = document.createElement("a")
     const url = URL.createObjectURL(blob)
     link.setAttribute("href", url)
-    link.setAttribute("download", `data-stunting-${selectedMonth}.csv`)
+    link.setAttribute("download", `data-stunting-${selectedMonth}-${selectedPosyandu}.csv`) // Update filename
     link.style.visibility = "hidden"
     document.body.appendChild(link)
     link.click()
@@ -153,6 +171,21 @@ export default function HistoryPage() {
                 </Select>
               </div>
               <div className="flex-1">
+                {/* New Posyandu Filter */}
+                <Select value={selectedPosyandu} onValueChange={setSelectedPosyandu}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Pilih Posyandu" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {POSYANDU_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex-1">
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
@@ -173,7 +206,7 @@ export default function HistoryPage() {
               <CardTitle className="text-sm font-medium">Total Pemeriksaan</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
+              <div className="text-2xl font-bold">{stats.total}</div> {/* Now uses filteredData.length */}
               <p className="text-xs text-muted-foreground">Bulan {selectedMonth}</p>
             </CardContent>
           </Card>
@@ -184,7 +217,8 @@ export default function HistoryPage() {
               <TrendingDown className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.stunting}</div>
+              <div className="text-2xl font-bold text-red-600">{stats.stunting}</div>{" "}
+              {/* Now uses filteredData.filter */}
               <p className="text-xs text-muted-foreground">
                 {stats.total > 0 ? ((stats.stunting / stats.total) * 100).toFixed(1) : "0"}% dari total
               </p>
@@ -197,7 +231,8 @@ export default function HistoryPage() {
               <TrendingUp className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.normal}</div>
+              <div className="text-2xl font-bold text-green-600">{stats.normal}</div>{" "}
+              {/* Now uses filteredData.filter */}
               <p className="text-xs text-muted-foreground">
                 {stats.total > 0 ? ((stats.normal / stats.total) * 100).toFixed(1) : "0"}% dari total
               </p>
@@ -211,14 +246,14 @@ export default function HistoryPage() {
               <div>
                 <CardTitle>Data Balita - {selectedMonth}</CardTitle>
                 <CardDescription>
-                  Menampilkan {filteredData.length} dari {stats.total} data balita
+                  Menampilkan {filteredData.length} dari {currentData.length} data balita
                 </CardDescription>
               </div>
               <Button
                 onClick={exportToCSV}
                 variant="outline"
                 className="flex items-center gap-2 bg-transparent"
-                disabled={currentData.length === 0}
+                disabled={filteredData.length === 0} // Disable if filteredData is empty
               >
                 <Download className="h-4 w-4" />
                 Cetak CSV
@@ -273,7 +308,6 @@ export default function HistoryPage() {
           </CardContent>
         </Card>
       </div>
-
       <TutorialButton />
     </div>
   )

@@ -103,7 +103,7 @@ export default function Dashboard() {
           <div className="flex justify-between items-start mb-2">
             <h1 className="text-4xl font-bold text-gray-900">Pencegah Stunting</h1>
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-700">MMD FILKOM 2025 - 11</p>
+              <p className="text-sm font-medium text-gray-700">MMD FILKOM 2025 - Kelompok 11</p>
             </div>
           </div>
           <p className="text-gray-600">Sistem Monitoring Stunting untuk Posyandu</p>
