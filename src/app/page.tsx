@@ -1,7 +1,7 @@
 "use client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import type React from "react"
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Button } from "@/components/ui/button"
 import { Users, TrendingUp, Calendar, Plus, Search } from "lucide-react"
 import { TutorialButton } from "@/features/dashboard/components/tutorial-button"
